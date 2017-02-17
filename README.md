@@ -48,9 +48,9 @@ wxbarcode.qrcode('qrcode', '1234567890123456789', 420, 420);
 参数：
 
 - id: wxml文件中的 Canvas ID
-- code: 用于生成条形码的字符串
-- width: 生成的条形码宽度，单位 rpx
-- height: 生成的条形码高度，单位 rpx
+- code: 用于生成二维码的字符串
+- width: 生成的二维码宽度，单位 rpx
+- height: 生成的二维码高度，单位 rpx
 
 ## 例子
 
