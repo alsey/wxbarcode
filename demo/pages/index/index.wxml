@@ -1,0 +1,14 @@
+<!--index.wxml-->
+<view class="container page">
+  <view class="panel">
+    <view class="header">
+    </view>
+    <view class="barcode">
+      <view class="barnum">{{code}}</view>
+      <canvas canvas-id="barcode" />
+    </view>
+    <view class="qrcode">
+      <canvas canvas-id="qrcode" />
+    </view>
+  </view>
+</view>

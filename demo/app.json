@@ -1,0 +1,11 @@
+{
+  "pages":[
+    "pages/index/index"
+  ],
+  "window":{
+    "backgroundTextStyle":"light",
+    "navigationBarBackgroundColor": "#439057",
+    "navigationBarTitleText": "条码、二维码演示程序",
+    "navigationBarTextStyle":"white"
+  }
+}

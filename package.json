@@ -1,0 +1,36 @@
+{
+  "name": "wxbarcode",
+  "version": "1.0.0",
+  "description": "微信小程序条码、二维码生成模块",
+  "main": "index.js",
+  "scripts": {
+
+  },
+  "keywords": [
+    "wechat",
+    "weixin",  	
+    "wxapp",
+    "barcode",
+    "qrcode",
+    "微信",
+    "微信小程序",
+    "条码",
+    "二维码"
+  ],
+  "author": "Alsey (zamber@gmail.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/alsey/wxbarcode/issues"
+  },
+  "homepage": "https://github.com/alsey/wxbarcode#readme",
+  "dependencies": {
+
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alsey/wxbarcode.git"
+  },
+  "devDependencies": {
+  	
+  }
+}

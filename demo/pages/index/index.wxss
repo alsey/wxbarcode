@@ -1,0 +1,70 @@
+/**index.wxss**/
+page {
+    background-color: #439057;
+}
+
+.page {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+	padding-bottom: 10rpx;
+}
+
+.panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: stretch;
+    box-sizing: border-box;
+    width: 710rpx;
+    margin-top: 40rpx;
+    border-radius: 10rpx;
+    background-color: #fff;
+}
+
+.header {
+    height: 140rpx;
+    background-color: #f0f0f0;
+    border-radius: 10rpx 10rpx 0 0;
+}
+
+.barcode {
+    display: flex;
+    height: 320rpx;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.barnum {
+    width: 670rpx;
+    height: 100rpx;
+    line-height: 100rpx;
+    font-size: 38rpx;
+    font-weight: bold;
+    text-align: center;
+    letter-spacing: 10rpx;
+    white-space: nowrap;
+}
+
+.barcode > canvas {
+    width: 680rpx;
+    height: 200rpx;  
+}
+
+.qrcode {
+    height: 420rpx;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.qrcode > canvas {
+    width: 420rpx;
+    height: 420rpx;
+}
