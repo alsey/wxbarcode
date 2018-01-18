@@ -145,7 +145,10 @@ function stringToCode128(text) {
             if ((b < 48 || b > 57) && b != CHAR_TILDE)
                 return codeset;
         }
-        return CODESET.C;
+        if (bytes.length % 2 == 0)
+          return CODESET.C;
+        else
+          return CODESET.A;
     }
 
     //chr1 is current byte
