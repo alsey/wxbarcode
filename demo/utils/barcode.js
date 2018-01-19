@@ -37,6 +37,7 @@ exports.code128 = function (ctx, text, width, height) {
     height = parseInt(height);
 
     var codes = stringToCode128(text);
+    console.debug('codes', codes)
 
     var g = new Graphics(ctx, width, height);
 
@@ -67,7 +68,6 @@ exports.code128 = function (ctx, text, width, height) {
 
 
 function stringToCode128(text) {
-
     var barc = {
         currcs: CODESET.C
     };
@@ -145,7 +145,10 @@ function stringToCode128(text) {
             if ((b < 48 || b > 57) && b != CHAR_TILDE)
                 return codeset;
         }
-        return CODESET.C;
+        if (bytes.length % 2 == 0)
+            return CODESET.C;
+        else
+            return CODESET.A;
     }
 
     //chr1 is current byte
@@ -249,20 +252,20 @@ function codeSetAllowedFor(chr) {
     }
 }
 
-var Graphics = function(ctx, width, height) {
+var Graphics = function (ctx, width, height) {
 
     this.width = width;
     this.height = height;
     this.quiet = Math.round(this.width / 40);
-    
-    this.border_size   = 0;
+
+    this.border_size = 0;
     this.padding_width = 0;
 
     this.area = {
-        width : width - this.padding_width * 2 - this.quiet * 2,
+        width: width - this.padding_width * 2 - this.quiet * 2,
         height: height - this.border_size * 2,
-        top   : this.border_size - 4,
-        left  : this.padding_width + this.quiet
+        top: this.border_size - 4,
+        left: this.padding_width + this.quiet
     };
 
     this.ctx = ctx;
@@ -270,23 +273,23 @@ var Graphics = function(ctx, width, height) {
     this.bg = "#ffffff";
 
     // fill background
-    this.fillBgRect(0,0, width, height);
+    this.fillBgRect(0, 0, width, height);
 
     // fill center to create border
     this.fillBgRect(0, this.border_size, width, height - this.border_size * 2);
 }
 
 //use native color
-Graphics.prototype._fillRect = function(x, y, width, height, color) {
+Graphics.prototype._fillRect = function (x, y, width, height, color) {
     this.ctx.setFillStyle(color)
     this.ctx.fillRect(x, y, width, height)
 }
 
-Graphics.prototype.fillFgRect = function(x,y, width, height) {
+Graphics.prototype.fillFgRect = function (x, y, width, height) {
     this._fillRect(x, y, width, height, this.fg);
 }
 
-Graphics.prototype.fillBgRect = function(x,y, width, height) {
+Graphics.prototype.fillBgRect = function (x, y, width, height) {
     this._fillRect(x, y, width, height, this.bg);
 }
 

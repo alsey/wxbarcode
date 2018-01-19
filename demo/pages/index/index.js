@@ -7,8 +7,8 @@ Page({
         code: '1234567890123456789'
     },
 
-    onLoad: function() {
+    onLoad: function () {
         wxbarcode.barcode('barcode', '1234567890123456789', 680, 200);
-        wxbarcode.qrcode('qrcode', '1234567890123456789', 420, 420);
+        wxbarcode.qrcode('qrcode', '1234567890123456789', 420, 420, '../../imgs/timg.jpg', 80);//img path & img size rpx
     }
 })

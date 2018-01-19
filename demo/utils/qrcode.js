@@ -2,10 +2,10 @@ var QR = (function () {
 
     // alignment pattern
     var adelta = [
-      0, 11, 15, 19, 23, 27, 31, // force 1 pat
-      16, 18, 20, 22, 24, 26, 28, 20, 22, 24, 24, 26, 28, 28, 22, 24, 24,
-      26, 26, 28, 28, 24, 24, 26, 26, 26, 28, 28, 24, 26, 26, 26, 28, 28
-      ];
+        0, 11, 15, 19, 23, 27, 31, // force 1 pat
+        16, 18, 20, 22, 24, 26, 28, 20, 22, 24, 24, 26, 28, 28, 22, 24, 24,
+        26, 26, 28, 28, 24, 24, 26, 26, 26, 28, 28, 24, 26, 26, 26, 28, 28
+    ];
 
     // version block
     var vpat = [
@@ -110,13 +110,12 @@ var QR = (function () {
 
     // Working buffers:
     // data input and ecc append, image working buffer, fixed part of image, run lengths for badness
-    var strinbuf=[], eccbuf=[], qrframe=[], framask=[], rlens=[]; 
+    var strinbuf = [], eccbuf = [], qrframe = [], framask = [], rlens = [];
     // Control values - width is based on version, last 4 are from table.
     var version, width, neccblk1, neccblk2, datablkw, eccblkwid;
     var ecclevel = 2;
     // set bit to indicate cell in qrframe is immutable.  symmetric around diagonal
-    function setmask(x, y)
-    {
+    function setmask(x, y) {
         var bt;
         if (x > y) {
             bt = x;
@@ -133,8 +132,7 @@ var QR = (function () {
     }
 
     // enter alignment pattern - black to qrframe, white to mask (later black frame merged to mask)
-    function putalign(x, y)
-    {
+    function putalign(x, y) {
         var j;
 
         qrframe[x + width * y] = 1;
@@ -155,8 +153,7 @@ var QR = (function () {
     //========================================================================
     // Reed Solomon error correction
     // exponentiation mod N
-    function modnn(x)
-    {
+    function modnn(x) {
         while (x >= 255) {
             x -= 255;
             x = (x >> 8) + (x & 255);
@@ -167,8 +164,7 @@ var QR = (function () {
     var genpoly = [];
 
     // Calculate and append ECC data to data block.  Block is in strinbuf, indexes to buffers given.
-    function appendrs(data, dlen, ecbuf, eclen)
-    {
+    function appendrs(data, dlen, ecbuf, eclen) {
         var i, j, fb;
 
         for (i = 0; i < eclen; i++)
@@ -179,9 +175,9 @@ var QR = (function () {
                 for (j = 1; j < eclen; j++)
                     strinbuf[ecbuf + j - 1] = strinbuf[ecbuf + j] ^ gexp[modnn(fb + genpoly[eclen - j])];
             else
-                for( j = ecbuf ; j < ecbuf + eclen; j++ )
+                for (j = ecbuf; j < ecbuf + eclen; j++)
                     strinbuf[j] = strinbuf[j + 1];
-            strinbuf[ ecbuf + eclen - 1] = fb == 255 ? 0 : gexp[modnn(fb + genpoly[0])];
+            strinbuf[ecbuf + eclen - 1] = fb == 255 ? 0 : gexp[modnn(fb + genpoly[0])];
         }
     }
 
@@ -189,8 +185,7 @@ var QR = (function () {
     // Frame data insert following the path rules
 
     // check mask - since symmetrical use half.
-    function ismasked(x, y)
-    {
+    function ismasked(x, y) {
         var bt;
         if (x > y) {
             bt = x;
@@ -206,91 +201,90 @@ var QR = (function () {
 
     //========================================================================
     //  Apply the selected mask out of the 8.
-    function  applymask(m)
-    {
+    function applymask(m) {
         var x, y, r3x, r3y;
 
         switch (m) {
-        case 0:
-            for (y = 0; y < width; y++)
-                for (x = 0; x < width; x++)
-                    if (!((x + y) & 1) && !ismasked(x, y))
-                        qrframe[x + y * width] ^= 1;
-            break;
-        case 1:
-            for (y = 0; y < width; y++)
-                for (x = 0; x < width; x++)
-                    if (!(y & 1) && !ismasked(x, y))
-                        qrframe[x + y * width] ^= 1;
-            break;
-        case 2:
-            for (y = 0; y < width; y++)
-                for (r3x = 0, x = 0; x < width; x++, r3x++) {
-                    if (r3x == 3)
-                        r3x = 0;
-                    if (!r3x && !ismasked(x, y))
-                        qrframe[x + y * width] ^= 1;
-                }
-            break;
-        case 3:
-            for (r3y = 0, y = 0; y < width; y++, r3y++) {
-                if (r3y == 3)
-                    r3y = 0;
-                for (r3x = r3y, x = 0; x < width; x++, r3x++) {
-                    if (r3x == 3)
-                        r3x = 0;
-                    if (!r3x && !ismasked(x, y))
-                        qrframe[x + y * width] ^= 1;
-                }
-            }
-            break;
-        case 4:
-            for (y = 0; y < width; y++)
-                for (r3x = 0, r3y = ((y >> 1) & 1), x = 0; x < width; x++, r3x++) {
-                    if (r3x == 3) {
-                        r3x = 0;
-                        r3y = !r3y;
+            case 0:
+                for (y = 0; y < width; y++)
+                    for (x = 0; x < width; x++)
+                        if (!((x + y) & 1) && !ismasked(x, y))
+                            qrframe[x + y * width] ^= 1;
+                break;
+            case 1:
+                for (y = 0; y < width; y++)
+                    for (x = 0; x < width; x++)
+                        if (!(y & 1) && !ismasked(x, y))
+                            qrframe[x + y * width] ^= 1;
+                break;
+            case 2:
+                for (y = 0; y < width; y++)
+                    for (r3x = 0, x = 0; x < width; x++ , r3x++) {
+                        if (r3x == 3)
+                            r3x = 0;
+                        if (!r3x && !ismasked(x, y))
+                            qrframe[x + y * width] ^= 1;
                     }
-                    if (!r3y && !ismasked(x, y))
-                        qrframe[x + y * width] ^= 1;
+                break;
+            case 3:
+                for (r3y = 0, y = 0; y < width; y++ , r3y++) {
+                    if (r3y == 3)
+                        r3y = 0;
+                    for (r3x = r3y, x = 0; x < width; x++ , r3x++) {
+                        if (r3x == 3)
+                            r3x = 0;
+                        if (!r3x && !ismasked(x, y))
+                            qrframe[x + y * width] ^= 1;
+                    }
                 }
-            break;
-        case 5:
-            for (r3y = 0, y = 0; y < width; y++, r3y++) {
-                if (r3y == 3)
-                    r3y = 0;
-                for (r3x = 0, x = 0; x < width; x++, r3x++) {
-                    if (r3x == 3)
-                        r3x = 0;
-                    if (!((x & y & 1) + !(!r3x | !r3y)) && !ismasked(x, y))
-                        qrframe[x + y * width] ^= 1;
+                break;
+            case 4:
+                for (y = 0; y < width; y++)
+                    for (r3x = 0, r3y = ((y >> 1) & 1), x = 0; x < width; x++ , r3x++) {
+                        if (r3x == 3) {
+                            r3x = 0;
+                            r3y = !r3y;
+                        }
+                        if (!r3y && !ismasked(x, y))
+                            qrframe[x + y * width] ^= 1;
+                    }
+                break;
+            case 5:
+                for (r3y = 0, y = 0; y < width; y++ , r3y++) {
+                    if (r3y == 3)
+                        r3y = 0;
+                    for (r3x = 0, x = 0; x < width; x++ , r3x++) {
+                        if (r3x == 3)
+                            r3x = 0;
+                        if (!((x & y & 1) + !(!r3x | !r3y)) && !ismasked(x, y))
+                            qrframe[x + y * width] ^= 1;
+                    }
                 }
-            }
-            break;
-        case 6:
-            for (r3y = 0, y = 0; y < width; y++, r3y++) {
-                if (r3y == 3)
-                    r3y = 0;
-                for (r3x = 0, x = 0; x < width; x++, r3x++) {
-                    if (r3x == 3)
-                        r3x = 0;
-                    if (!(((x & y & 1) + (r3x && (r3x == r3y))) & 1) && !ismasked(x, y))
-                        qrframe[x + y * width] ^= 1;
+                break;
+            case 6:
+                for (r3y = 0, y = 0; y < width; y++ , r3y++) {
+                    if (r3y == 3)
+                        r3y = 0;
+                    for (r3x = 0, x = 0; x < width; x++ , r3x++) {
+                        if (r3x == 3)
+                            r3x = 0;
+                        if (!(((x & y & 1) + (r3x && (r3x == r3y))) & 1) && !ismasked(x, y))
+                            qrframe[x + y * width] ^= 1;
+                    }
                 }
-            }
-            break;
-        case 7:
-            for (r3y = 0, y = 0; y < width; y++, r3y++) {
-                if (r3y == 3)
-                    r3y = 0;
-                for (r3x = 0, x = 0; x < width; x++, r3x++) {
-                    if (r3x == 3)
-                        r3x = 0;
-                    if (!(((r3x && (r3x == r3y)) + ((x + y) & 1)) & 1) && !ismasked(x, y))
-                        qrframe[x + y * width] ^= 1;
+                break;
+            case 7:
+                for (r3y = 0, y = 0; y < width; y++ , r3y++) {
+                    if (r3y == 3)
+                        r3y = 0;
+                    for (r3x = 0, x = 0; x < width; x++ , r3x++) {
+                        if (r3x == 3)
+                            r3x = 0;
+                        if (!(((r3x && (r3x == r3y)) + ((x + y) & 1)) & 1) && !ismasked(x, y))
+                            qrframe[x + y * width] ^= 1;
+                    }
                 }
-            }
-            break;
+                break;
         }
         return;
     }
@@ -300,8 +294,7 @@ var QR = (function () {
 
     // Using the table of the length of each run, calculate the amount of bad image 
     // - long runs or those that look like finders; called twice, once each for X and Y
-    function badruns(length)
-    {
+    function badruns(length) {
         var i;
         var runsbad = 0;
         for (i = 0; i <= length; i++)
@@ -317,14 +310,13 @@ var QR = (function () {
                 && (rlens[i - 3] == 0 // beginning
                     || i + 3 > length  // end
                     || rlens[i - 3] * 3 >= rlens[i] * 4 || rlens[i + 3] * 3 >= rlens[i] * 4)
-               )
+            )
                 runsbad += N3;
         return runsbad;
     }
 
     // Calculate how bad the masked image is - blocks, imbalance, runs, or finders.
-    function badcheck()
-    {
+    function badcheck() {
         var x, y, h, b, b1;
         var thisbad = 0;
         var bw = 0;
@@ -333,9 +325,9 @@ var QR = (function () {
         for (y = 0; y < width - 1; y++)
             for (x = 0; x < width - 1; x++)
                 if ((qrframe[x + width * y] && qrframe[(x + 1) + width * y]
-                     && qrframe[x + width * (y + 1)] && qrframe[(x + 1) + width * (y + 1)]) // all black
+                    && qrframe[x + width * (y + 1)] && qrframe[(x + 1) + width * (y + 1)]) // all black
                     || !(qrframe[x + width * y] || qrframe[(x + 1) + width * y]
-                         || qrframe[x + width * (y + 1)] || qrframe[(x + 1) + width * (y + 1)])) // all white
+                        || qrframe[x + width * (y + 1)] || qrframe[(x + 1) + width * (y + 1)])) // all white
                     thisbad += N2;
 
         // X runs
@@ -379,11 +371,10 @@ var QR = (function () {
         return thisbad;
     }
 
-    function genframe(instring)
-    {
+    function genframe(instring) {
         var x, y, k, t, v, i, j, m;
 
-    // find the smallest version that fits the string
+        // find the smallest version that fits the string
         t = instring.length;
         version = 0;
         do {
@@ -398,22 +389,22 @@ var QR = (function () {
                 break;
         } while (version < 40);
 
-    // FIXME - insure that it fits insted of being truncated
+        // FIXME - insure that it fits insted of being truncated
         width = 17 + 4 * version;
 
-    // allocate, clear and setup data structures
+        // allocate, clear and setup data structures
         v = datablkw + (datablkw + eccblkwid) * (neccblk1 + neccblk2) + neccblk2;
-        for( t = 0; t < v; t++ )
+        for (t = 0; t < v; t++)
             eccbuf[t] = 0;
         strinbuf = instring.slice(0);
 
-        for( t = 0; t < width * width; t++ )
+        for (t = 0; t < width * width; t++)
             qrframe[t] = 0;
 
-        for( t = 0 ; t < (width * (width + 1) + 1) / 2; t++)
+        for (t = 0; t < (width * (width + 1) + 1) / 2; t++)
             framask[t] = 0;
 
-    // insert finders - black to frame, white to mask
+        // insert finders - black to frame, white to mask
         for (t = 0; t < 3; t++) {
             k = 0;
             y = 0;
@@ -442,11 +433,11 @@ var QR = (function () {
             }
         }
 
-    // alignment blocks
+        // alignment blocks
         if (version > 1) {
             t = adelta[version];
             y = width - 7;
-            for (;;) {
+            for (; ;) {
                 x = width - 7;
                 while (x > t - 3) {
                     putalign(x, y);
@@ -462,10 +453,10 @@ var QR = (function () {
             }
         }
 
-    // single black
+        // single black
         qrframe[8 + width * (width - 8)] = 1;
 
-    // timing gap - mask only
+        // timing gap - mask only
         for (y = 0; y < 7; y++) {
             setmask(7, y);
             setmask(width - 8, y);
@@ -477,7 +468,7 @@ var QR = (function () {
             setmask(x, width - 8);
         }
 
-    // reserve mask-format area
+        // reserve mask-format area
         for (x = 0; x < 9; x++)
             setmask(x, 8);
         for (x = 0; x < 8; x++) {
@@ -487,7 +478,7 @@ var QR = (function () {
         for (y = 0; y < 7; y++)
             setmask(8, y + width - 7);
 
-    // timing row/col
+        // timing row/col
         for (x = 0; x < width - 14; x++)
             if (x & 1) {
                 setmask(8 + x, 6);
@@ -498,38 +489,38 @@ var QR = (function () {
                 qrframe[6 + width * (8 + x)] = 1;
             }
 
-    // version block
+        // version block
         if (version > 6) {
             t = vpat[version - 7];
             k = 17;
             for (x = 0; x < 6; x++)
-                for (y = 0; y < 3; y++, k--)
+                for (y = 0; y < 3; y++ , k--)
                     if (1 & (k > 11 ? version >> (k - 12) : t >> k)) {
                         qrframe[(5 - x) + width * (2 - y + width - 11)] = 1;
                         qrframe[(2 - y + width - 11) + width * (5 - x)] = 1;
                     }
-            else {
-                setmask(5 - x, 2 - y + width - 11);
-                setmask(2 - y + width - 11, 5 - x);
-            }
+                    else {
+                        setmask(5 - x, 2 - y + width - 11);
+                        setmask(2 - y + width - 11, 5 - x);
+                    }
         }
 
-    // sync mask bits - only set above for white spaces, so add in black bits
+        // sync mask bits - only set above for white spaces, so add in black bits
         for (y = 0; y < width; y++)
             for (x = 0; x <= y; x++)
                 if (qrframe[x + width * y])
                     setmask(x, y);
 
-    // convert string to bitstream
-    // 8 bit data to QR-coded 8 bit data (numeric or alphanum, or kanji not supported)
+        // convert string to bitstream
+        // 8 bit data to QR-coded 8 bit data (numeric or alphanum, or kanji not supported)
         v = strinbuf.length;
 
-    // string to array
-        for( i = 0 ; i < v; i++ )
+        // string to array
+        for (i = 0; i < v; i++)
             eccbuf[i] = strinbuf.charCodeAt(i);
         strinbuf = eccbuf.slice(0);
 
-    // calculate max string length
+        // calculate max string length
         x = datablkw * (neccblk1 + neccblk2) + neccblk2;
         if (v >= x - 2) {
             v = x - 2;
@@ -537,7 +528,7 @@ var QR = (function () {
                 v--;
         }
 
-    // shift and repack to insert length prefix
+        // shift and repack to insert length prefix
         i = v;
         if (version > 9) {
             strinbuf[i + 2] = 0;
@@ -562,7 +553,7 @@ var QR = (function () {
             strinbuf[1] |= 255 & (v << 4);
             strinbuf[0] = 0x40 | (v >> 4);
         }
-    // fill to end with pad pattern
+        // fill to end with pad pattern
         i = v + 3 - (version < 10);
         while (i < x) {
             strinbuf[i++] = 0xec;
@@ -570,21 +561,21 @@ var QR = (function () {
             strinbuf[i++] = 0x11;
         }
 
-    // calculate and append ECC
+        // calculate and append ECC
 
-    // calculate generator polynomial
+        // calculate generator polynomial
         genpoly[0] = 1;
         for (i = 0; i < eccblkwid; i++) {
             genpoly[i + 1] = 1;
             for (j = i; j > 0; j--)
                 genpoly[j] = genpoly[j]
-                ? genpoly[j - 1] ^ gexp[modnn(glog[genpoly[j]] + i)] : genpoly[j - 1];
+                    ? genpoly[j - 1] ^ gexp[modnn(glog[genpoly[j]] + i)] : genpoly[j - 1];
             genpoly[0] = gexp[modnn(glog[genpoly[0]] + i)];
         }
         for (i = 0; i <= eccblkwid; i++)
             genpoly[i] = glog[genpoly[i]]; // use logs for genpoly[] to save calc step
 
-    // append ecc to data buffer
+        // append ecc to data buffer
         k = x;
         y = 0;
         for (i = 0; i < neccblk1; i++) {
@@ -597,7 +588,7 @@ var QR = (function () {
             y += datablkw + 1;
             k += eccblkwid;
         }
-    // interleave blocks
+        // interleave blocks
         y = 0;
         for (i = 0; i < datablkw; i++) {
             for (j = 0; j < neccblk1; j++)
@@ -612,14 +603,14 @@ var QR = (function () {
                 eccbuf[y++] = strinbuf[x + i + j * eccblkwid];
         strinbuf = eccbuf;
 
-    // pack bits into frame avoiding masked area.
+        // pack bits into frame avoiding masked area.
         x = y = width - 1;
         k = v = 1;         // up, minus
         /* inteleaved data and ecc codes */
         m = (datablkw + eccblkwid) * (neccblk1 + neccblk2) + neccblk2;
         for (i = 0; i < m; i++) {
             t = strinbuf[i];
-            for (j = 0; j < 8; j++, t <<= 1) {
+            for (j = 0; j < 8; j++ , t <<= 1) {
                 if (0x80 & t)
                     qrframe[x + width * y] = 1;
                 do {        // find next fill position
@@ -657,13 +648,13 @@ var QR = (function () {
             }
         }
 
-    // save pre-mask copy of frame
+        // save pre-mask copy of frame
         strinbuf = qrframe.slice(0);
         t = 0;           // best
         y = 30000;         // demerit
-    // for instead of while since in original arduino code
-    // if an early mask was "good enough" it wouldn't try for a better one
-    // since they get more complex and take longer.
+        // for instead of while since in original arduino code
+        // if an early mask was "good enough" it wouldn't try for a better one
+        // since they get more complex and take longer.
         for (k = 0; k < 8; k++) {
             applymask(k);      // returns black-white imbalance
             x = badcheck();
@@ -678,10 +669,10 @@ var QR = (function () {
         if (t != k)         // redo best mask - none good enough, last wasn't t
             applymask(t);
 
-    // add in final mask/ecclevel bytes
+        // add in final mask/ecclevel bytes
         y = fmtword[t + ((ecclevel - 1) << 3)];
         // low byte
-        for (k = 0; k < 8; k++, y >>= 1)
+        for (k = 0; k < 8; k++ , y >>= 1)
             if (y & 1) {
                 qrframe[(width - 1 - k) + width * 8] = 1;
                 if (k < 6)
@@ -690,7 +681,7 @@ var QR = (function () {
                     qrframe[8 + width * (k + 1)] = 1;
             }
         // high byte
-        for (k = 0; k < 7; k++, y >>= 1)
+        for (k = 0; k < 7; k++ , y >>= 1)
             if (y & 1) {
                 qrframe[8 + width * (width - 7 + k)] = 1;
                 if (k)
@@ -699,7 +690,7 @@ var QR = (function () {
                     qrframe[7 + width * 8] = 1;
             }
 
-    // return image
+        // return image
         return qrframe;
     }
 
@@ -708,27 +699,27 @@ var QR = (function () {
 
     var api = {
 
-        get ecclevel () {
+        get ecclevel() {
             return ecclevel;
         },
 
-        set ecclevel (val) {
+        set ecclevel(val) {
             ecclevel = val;
         },
 
-        get size () {
+        get size() {
             return _size;
         },
 
-        set size (val) {
+        set size(val) {
             _size = val
         },
 
-        get canvas () {
+        get canvas() {
             return _canvas;
         },
 
-        set canvas (el) {
+        set canvas(el) {
             _canvas = el;
         },
 
@@ -736,8 +727,8 @@ var QR = (function () {
             return genframe(string);
         },
 
-        draw: function (string, canvas, size, ecc) {
-            
+        draw: function (string, canvas, size, ecc, icoPath, icoSize) {
+
             ecclevel = ecc || ecclevel;
             canvas = canvas || _canvas;
 
@@ -750,9 +741,9 @@ var QR = (function () {
 
             var frame = genframe(string),
                 ctx = canvas.ctx,
-                px = Math.round(size / (width + 8));
+                px = Math.round(size / (width + 2));
 
-            var roundedSize = px * (width + 8),
+            var roundedSize = px * (width + 2),
                 offset = Math.floor((size - roundedSize) / 2);
 
             size = roundedSize;
@@ -763,12 +754,44 @@ var QR = (function () {
             for (var i = 0; i < width; i++) {
                 for (var j = 0; j < width; j++) {
                     if (frame[j * width + i]) {
-                        ctx.fillRect(px * (4 + i) + offset, px * (4 + j) + offset, px, px);
+                        ctx.fillRect(px * (1 + i) + offset, px * (1 + j) + offset, px, px);
                     }
                 }
             }
+
+            //draw logo
+            //console.log('icoPath:', icoPath);
+            //console.log('icoSize:', icoSize);
+            if (!!icoPath && !!icoSize) {
+                //logo
+                var icoOffset = (size - icoSize) / 2;
+                // console.log('size:', size);
+                // console.log('icoSize:', icoSize);
+                // console.log('icoOffset:', icoOffset);
+                ctx.drawImage(icoPath, offset + icoOffset, offset + icoOffset, icoSize, icoSize);
+                //Rect
+                var rectSize = icoSize * 1.1;
+                var rectOffset = icoOffset - (rectSize - icoSize) / 2;
+                ctx.setStrokeStyle("#000000")
+                ctx.setLineWidth(3)
+                this.roundRect(ctx, offset + rectOffset, offset + rectOffset, rectSize, rectSize, 5);
+                ctx.stroke()
+            }
+
             ctx.draw();
-        }
+        },
+
+        roundRect: function (cxt, x, y, width, height, radius) {
+            cxt.beginPath();
+            cxt.arc(x + radius, y + radius, radius, Math.PI, Math.PI * 3 / 2);
+            cxt.lineTo(width - radius + x, y);
+            cxt.arc(width - radius + x, radius + y, radius, Math.PI * 3 / 2, Math.PI * 2);
+            cxt.lineTo(width + x, height + y - radius);
+            cxt.arc(width - radius + x, height - radius + y, radius, 0, Math.PI * 1 / 2);
+            cxt.lineTo(radius + x, height + y);
+            cxt.arc(radius + x, height - radius + y, radius, Math.PI * 1 / 2, Math.PI);
+            cxt.closePath();
+        },
     }
 
     module.exports = {
