@@ -30,7 +30,7 @@ function getBytes(str) {
     return bytes;
 }
 
-exports.code128 = function (ctx, text, width, height) {
+exports.code128 = function (ctx, text, width, height，color) {
 
     width = parseInt(width);
 
@@ -38,7 +38,7 @@ exports.code128 = function (ctx, text, width, height) {
 
     var codes = stringToCode128(text);
 
-    var g = new Graphics(ctx, width, height);
+    var g = new Graphics(ctx, width, height, color);
 
     var barWeight = g.area.width / ((codes.length - 3) * 11 + 35);
 
@@ -249,7 +249,7 @@ function codeSetAllowedFor(chr) {
     }
 }
 
-var Graphics = function(ctx, width, height) {
+var Graphics = function(ctx, width, height, color) {
 
     this.width = width;
     this.height = height;
@@ -266,7 +266,7 @@ var Graphics = function(ctx, width, height) {
     };
 
     this.ctx = ctx;
-    this.fg = "#000000";
+    this.fg = color;
     this.bg = "#ffffff";
 
     // fill background
