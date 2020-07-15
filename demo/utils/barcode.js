@@ -30,7 +30,7 @@ function getBytes(str) {
     return bytes;
 }
 
-exports.code128 = function (ctx, text, width, height) {
+exports.code128 = function (ctx, text, width, height, isVertical) {
 
     width = parseInt(width);
 
@@ -38,9 +38,9 @@ exports.code128 = function (ctx, text, width, height) {
 
     var codes = stringToCode128(text);
 
-    var g = new Graphics(ctx, width, height);
+    var g = new Graphics(ctx, width, height, isVertical);
 
-    var barWeight = g.area.width / ((codes.length - 3) * 11 + 35);
+    var barWeight = isVertical ? (g.area.height / ((codes.length - 3) * 11 + 35)) : (g.area.width / ((codes.length - 3) * 11 + 35));
 
     var x = g.area.left;
     var y = g.area.top;
@@ -48,17 +48,29 @@ exports.code128 = function (ctx, text, width, height) {
         var c = codes[i];
         //two bars at a time: 1 black and 1 white
         for (var bar = 0; bar < 8; bar += 2) {
-            var barW = PATTERNS[c][bar] * barWeight;
-            // var barH = height - y - this.border;
-            var barH = height - y;
-            var spcW = PATTERNS[c][bar + 1] * barWeight;
+            if (isVertical) {
+                var barH = PATTERNS[c][bar] * barWeight;
+                var barW = width - x;
+                var spcH = PATTERNS[c][bar + 1] * barWeight;
 
-            //no need to draw if 0 width
-            if (barW > 0) {
-                g.fillFgRect(x, y, barW, barH);
+                if (barH > 0) {
+                  g.fillFgRect(x, y, barW, barH);
+                }
+
+                y += barH + spcH;
+            } else {
+                var barW = PATTERNS[c][bar] * barWeight;
+                // var barH = height - y - this.border;
+                var barH = height - y;
+                var spcW = PATTERNS[c][bar + 1] * barWeight;
+
+                //no need to draw if 0 width
+                if (barW > 0) {
+                    g.fillFgRect(x, y, barW, barH);
+                }
+
+                x += barW + spcW;
             }
-
-            x += barW + spcW;
         }
     }
 
@@ -249,21 +261,30 @@ function codeSetAllowedFor(chr) {
     }
 }
 
-var Graphics = function(ctx, width, height) {
+var Graphics = function(ctx, width, height, isVertical) {
 
     this.width = width;
     this.height = height;
-    this.quiet = Math.round(this.width / 40);
-    
-    this.border_size   = 0;
-    this.padding_width = 0;
+    this.quiet = isVertical ? Math.round(this.height / 40) : Math.round(this.width / 40);
 
-    this.area = {
-        width : width - this.padding_width * 2 - this.quiet * 2,
-        height: height - this.border_size * 2,
-        top   : this.border_size - 4,
-        left  : this.padding_width + this.quiet
-    };
+    this.border_size   = 0;
+    this.padding_gap = 0;
+
+    if (isVertical) {
+        this.area = {
+            width: width - this.border_size * 2,
+            height: height - this.padding_gap * 2 - this.quiet * 2,
+            top: this.padding_gap + this.quiet,
+            left: this.border_size - 4,
+          };
+    } else {
+        this.area = {
+            width : width - this.padding_gap * 2 - this.quiet * 2,
+            height: height - this.border_size * 2,
+            top   : this.border_size - 4,
+            left  : this.padding_gap + this.quiet
+        };
+    }
 
     this.ctx = ctx;
     this.fg = "#000000";
