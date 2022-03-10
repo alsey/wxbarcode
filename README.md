@@ -19,11 +19,20 @@ $ npm install wxbarcode
 
 ## 使用方法
 
+> 1. 改为 canvas2d 绘图
+> 2. 修复 code 奇数位最后一位的错误
+> 3. 支持组件使用, 组件内使用最后一位参数传this
+
 ```js
 import wxbarcode from 'wxbarcode'
 
-wxbarcode.barcode('barcode', '1234567890123456789', 680, 200);
-wxbarcode.qrcode('qrcode', '1234567890123456789', 420, 420);
+wxbarcode.barcode('#barcode', '1234567890123456789', 680, 200);
+wxbarcode.qrcode('#qrcode', '1234567890123456789', 420, 420);
+
+// 组件内使用
+
+wxbarcode.barcode('#barcode', '1234567890123456789', 680, 200, this);
+wxbarcode.qrcode('#qrcode', '1234567890123456789', 420, 420, this);
 ```
 
 ### 条形码
@@ -34,7 +43,7 @@ wxbarcode.qrcode('qrcode', '1234567890123456789', 420, 420);
 
 参数：
 
-- id: wxml文件中的 Canvas ID
+- id: wxml文件中的 Canvas 的 id, 不是canvas-id
 - code: 用于生成条形码的字符串
 - width: 生成的条形码宽度，单位 rpx
 - height: 生成的条形码高度，单位 rpx
@@ -47,7 +56,7 @@ wxbarcode.qrcode('qrcode', '1234567890123456789', 420, 420);
 
 参数：
 
-- id: wxml文件中的 Canvas ID
+- id: wxml文件中的 的 Canvas 的 id, 不是canvas-id
 - code: 用于生成二维码的字符串
 - width: 生成的二维码宽度，单位 rpx
 - height: 生成的二维码高度，单位 rpx
